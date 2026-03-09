@@ -60,6 +60,15 @@ return [
             'report' => false,
         ],
 
+        'public_uploads' => [
+        'driver' => 'local',
+        'root' => public_path('uploads'),
+        'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+        'visibility' => 'public',
+        'throw' => false,
+        'report' => false,
+    ]
+
     ],
 
     /*
@@ -77,4 +86,5 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    
 ];

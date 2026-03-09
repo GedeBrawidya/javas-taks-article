@@ -14,7 +14,8 @@ class TagController extends Controller
     public function index()
     {
         $tags = Tag::latest()->paginate(10);
-        return view('tags.index', compact('tags'));
+        $data['tags'] = $tags;
+        return view('tags.index', $data);
     }
 
     /**
@@ -51,16 +52,19 @@ class TagController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tag $tag)
+    public function edit($id)
     {
-        return view(('admin.tags.edit'), compact('tag')); 
+        $tag = Tag::findOrFail($id);
+        $data ['tag'] = $tag;
+        return view(('admin.tags.edit'), $data); 
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tag $tag)
+    public function update(Request $request, $id)
     {
+        $tag = Tag::findOrFail($id);
         $request->validate([
             'name' => 'required|string|max:255|unique:tags,name,' . $tag->id,
         ]);
@@ -76,8 +80,9 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tag $tag)
+    public function destroy($id)
     {
+        $tag = Tag::findOrFail($id);
 
         if($tag->articles()->exists()){
             return redirect()->back()->with('error', 'The tag cannot be deleted because there are still related articles');

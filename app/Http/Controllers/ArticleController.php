@@ -18,7 +18,8 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = Article::latest()->with('user', 'category')->paginate(10);
-        return view('articles.index', compact('articles'));
+        $data['articles'] = $articles;
+        return view('articles.index', $data);
     }
 
     
@@ -30,7 +31,12 @@ class ArticleController extends Controller
         $categories = Category::all(); 
         $tags = Tag::all();
 
-        return view('admin.articles.create', compact('categories', 'tags'));
+        $data = [
+        'categories' => $categories,
+        'tags' => $tags
+        ];
+
+        return view('admin.articles.create', $data);
     }
 
     /**
@@ -49,7 +55,7 @@ class ArticleController extends Controller
 
         $path = null;
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('articles', 'public');
+            $path = Storage::disk('public_uploads')->put('articles', $request->file('featured_image'));
         }
 
         $article = Article::create([
@@ -79,20 +85,31 @@ class ArticleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Article $article)
+    public function edit($id)
     {
+        $article = Article::findOrFail($id);
         $categories = \App\Models\Category::all();
         $tags = \App\Models\Tag::all();
         $articleTags = $article->tags->pluck('id')->toArray(); 
+
+        $data = [
+            'article' => $article,
+            'categories' => $categories,
+            'tags' => $tags,
+            'articleTags' => $articleTags
+        ];
         
-        return view('admin.articles.edit', compact('article', 'categories', 'tags', 'articleTags'));
+        return view('admin.articles.edit', $data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Article $article)
+    public function update(Request $request, $id)
     {
+
+        $article = Article::findOrFail($id);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -106,13 +123,15 @@ class ArticleController extends Controller
             'category_id' => $request->category_id,
         ];
 
-        if ($request->hasFile('image')) {
-            // Hapus file lama jika ada dan bukan dari seeder (bukan link http)
-            if ($article->featured_image && !Str::startsWith($article->featured_image, 'http')) {
-                Storage::disk('public')->delete($article->featured_image);
-            }
+        
 
-            $data['featured_image'] = $request->file('image')->store('articles', 'public');
+        if ($request->hasFile('image')) {
+
+            $data['featured_image'] = Storage::disk('public_uploads')->put('articles', $request->file('image'));
+            // Hapus file lama jika ada dan bukan dari seeder (bukan link http)
+            if (Storage::disk('public_uploads')->exists($article->featured_image)) {
+                Storage::disk('public_uploads')->delete($article->featured_image);
+            } 
         }
 
         $article->update($data);
@@ -123,8 +142,12 @@ class ArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Article $article)
+    public function destroy($id)
     {
+        $article = Article::findOrFail($id);
+        if (Storage::disk('public_uploads')->exists($article->featured_image)) {
+            Storage::disk('public_uploads')->delete($article->featured_image);
+        }
         $article->delete();
         return back()->with('success', 'article deleted successfully!');
     }

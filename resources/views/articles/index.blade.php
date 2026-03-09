@@ -41,7 +41,7 @@
                                             @if(Str::startsWith($article->featured_image, 'http'))
                                                 <img src="{{ $article->featured_image }}" class="w-20 h-14 object-cover rounded shadow-sm">
                                             @else
-                                                <img src="{{ asset('storage/' . $article->featured_image) }}" class="w-20 h-14 object-cover rounded shadow-sm">
+                                                <img src="{{ asset('uploads/' . $article->featured_image) }}" class="w-20 h-14 object-cover rounded shadow-sm">
                                             @endif
                                         @else
                                             <div class="w-20 h-14 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center text-[10px] italic">No Image</div>

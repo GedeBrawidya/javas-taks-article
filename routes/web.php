@@ -6,7 +6,8 @@ use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     $articles = Article::with(['category', 'user'])->latest()->paginate(9);
-    return view('welcome', compact('articles'));
+    $data['articles'] = $articles;
+    return view('welcome', $data);
 });
 
 // Route::get('/dashboard', function () {
@@ -20,3 +21,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';
