@@ -24,8 +24,6 @@ class ArticleFactory extends Factory
             'content' => fake()->paragraph(10, true),
             'status' => fake() ->boolean(80),
             'featured_image' => fake()->imageUrl(800, 600, 'articles', true),
-            'category_id' => Category::factory(),
-
         ];
     }
 

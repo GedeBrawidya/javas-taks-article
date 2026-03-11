@@ -19,7 +19,7 @@ class ArticleController extends Controller
     {
         $articles = Article::latest()->with('user', 'category')->paginate(10);
         $data['articles'] = $articles;
-        return view('articles.index', $data);
+        return view('admin.articles.index', $data);
     }
 
     

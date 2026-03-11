@@ -20,8 +20,6 @@ class CommentFactory extends Factory
     {
         return [
             'content' => fake() ->paragraph(2,true),
-            'user_id' => User::factory(),
-            'article_id' => Article::factory()
         ];
     }
 }

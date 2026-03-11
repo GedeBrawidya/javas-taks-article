@@ -15,9 +15,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::with('roles')->latest()->paginate(10);
         $data['users'] = $users;
-        return view('users.index', $data);
+        return view('admin.users.index', $data);
     }
 
     /**

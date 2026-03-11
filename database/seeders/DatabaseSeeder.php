@@ -41,9 +41,10 @@ class DatabaseSeeder extends Seeder
     $admin->roles()->attach($adminRole->pluck('id'));
 
    User::factory(10)->create()->each(function ($user) use ($normalRoles, $tags, $categories) { 
-    $user->roles()->attach(
-        $normalRoles->random(rand(1, 2))->pluck('id')
+     $user->roles()->attach(
+        collect($normalRoles->random(rand(1,2)))->pluck('id')->toArray()
     );
+
 
     Article::factory(3)->create([
         'user_id' => $user->id,
@@ -54,7 +55,8 @@ class DatabaseSeeder extends Seeder
         );
     
         Comment::factory(5)->create([
-            'article_id' => $article->id
+            'article_id' => $article->id,
+            'user_id' => User::inRandomOrder()->first()->id
         ]);
     });
 });

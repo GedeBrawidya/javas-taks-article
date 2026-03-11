@@ -23,9 +23,10 @@
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table-fixed">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 w-2/5">Name</th>
-                                    <th scope="col" class="px-6 py-3 w-2/5">Email</th>
-                                    <th scope="col" class="px-6 py-3 w-1/5 text-right">Actions</th>
+                                    <th scope="col" class="px-6 py-3 w-1/4">Name</th>
+                                    <th scope="col" class="px-6 py-3 w-1/4">Email</th>
+                                    <th scope="col" class="px-6 py-3 w-1/4">Role</th>
+                                    <th scope="col" class="px-6 py-3 w-1/4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -33,6 +34,7 @@
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $user->name }}</td>
                                     <td class="px-6 py-4">{{ $user->email }}</td>
+                                    <td class="px-6 py-4">{{ $user->roles->pluck('name')->implode(', ') }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex justify-end gap-3">
                                             <a href="{{ route('admin.users.edit', $user) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
