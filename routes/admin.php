@@ -4,6 +4,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\AdController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', \App\Http\Middleware\IsAdmin::class])
@@ -59,6 +61,29 @@ Route::middleware(['web', 'auth', \App\Http\Middleware\IsAdmin::class])
                 Route::put('{article}', 'update')->name('articles.update');
                 Route::delete('/{article}', 'destroy')->name('articles.destroy');
             });
-    
+
+        Route::prefix('partners')
+            ->controller(PartnerController::class)
+            ->group(function () {
+                Route::get('', 'index')->name('partners.index');
+                Route::get('create', 'create')->name('partners.create');
+                Route::post('', 'store')->name('partners.store');
+                Route::get('{partner}/edit', 'edit')->name('partners.edit');
+                Route::put('{partner}', 'update')->name('partners.update');
+                Route::delete('/{partner}', 'destroy')->name('partners.destroy');
+            });
+
+        Route::prefix('ads')
+            ->controller(AdController::class)
+            ->group(function () {
+                Route::get('', 'index')->name('ads.index');
+                Route::get('create', 'create')->name('ads.create');
+                Route::post('', 'store')->name('ads.store');
+                Route::get('{ad}/edit', 'edit')->name('ads.edit');
+                Route::put('{ad}', 'update')->name('ads.update');
+        
+                Route::delete('/{ad}', 'destroy')->name('ads.destroy');
+            });
+        
 
 });

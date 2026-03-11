@@ -12,154 +12,140 @@
     </head>
     <body class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 antialiased selection:bg-indigo-500 selection:text-white">
         
-        <!-- Navbar -->
-        <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 fixed w-full z-50 top-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16 items-center">
-                    <div class="flex-shrink-0 flex items-center gap-2">
-                        <x-application-logo class="w-8 h-8 fill-current text-indigo-600 dark:text-indigo-400" />
-                        <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white">Task Articles</span>
-                    </div>
-                    <!-- Mobile menu button -->
-                    <div class="-mr-2 flex items-center sm:hidden">
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="text-xs font-medium px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600">Log out</button>
-                        </form>
-                    </div>
-                    <div class="hidden sm:flex sm:items-center sm:ml-6 gap-4">
-                        @auth
-                            @if(Auth::user()->roles->contains('name', 'super admin'))
-                                <a href="{{ route('admin.dashboard') }}" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Admin Dashboard</a>
-                            @else
-                                {{-- Jika ada user dashboard/profile --}}
-                                <a href="{{ route('profile.edit') }}" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Profile</a>
-                            @endif
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="text-sm font-medium px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition">Log out</button>
-                            </form>
-                        @else
-                            <a href="{{ route('login') }}" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Log in</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-sm font-medium px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 transition shadow-md shadow-indigo-500/30">Register</a>
-                            @endif
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </nav>
+        <x-artify-navbar :articles="$articles" />
 
-        <!-- Hero Section -->
-        <div class="relative bg-white dark:bg-gray-800 overflow-hidden pt-16">
-            <div class="max-w-7xl mx-auto">
-                <div class="relative z-10 pb-8 bg-white dark:bg-gray-800 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-10 sm:pt-16 lg:pt-20 px-4 sm:px-6 lg:px-8">
-                    <main class="mx-auto max-w-7xl">
-                        <div class="sm:text-center lg:text-left">
-                            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                                <span class="block xl:inline">Discover top</span>
-                                <span class="block text-indigo-600 dark:text-indigo-400 xl:inline">technology articles</span>
-                            </h1>
-                            <p class="mt-3 text-base text-gray-500 dark:text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                                Expand your knowledge with insightful programming, design, and tech articles written by top contributors. Read, learn, and share your ideas.
-                            </p>
-                            @guest
-                            <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                                <div class="rounded-md shadow">
-                                    <a href="{{ route('register') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
-                                        Join our Community
-                                    </a>
+        <!-- Main Content (Premium Layout) -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+            
+            @if($articles->count() > 0)
+                @php $featured = $articles->first(); @endphp
+                <!-- Featured News section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                    <!-- Big Lead Story -->
+                    <div class="lg:col-span-2 group cursor-pointer">
+                        <div class="relative overflow-hidden rounded-lg mb-4 h-[400px] md:h-[500px] shadow-xl border border-gray-100 dark:border-gray-800">
+                            @if($featured->featured_image)
+                                <img src="{{ Str::startsWith($featured->featured_image, 'http') ? $featured->featured_image : asset('storage/' . $featured->featured_image) }}" alt="{{ $featured->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            @else
+                                <div class="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500 italic">Curating story...</div>
+                            @endif
+                            <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                                <span class="bg-[#C2B280] text-white text-[10px] tracking-widest font-black uppercase px-3 py-1 mb-4 inline-block rounded-sm">Featured Story</span>
+                                <h1 class="text-3xl md:text-5xl font-black text-white leading-tight">
+                                    {{ $featured->title }}
+                                </h1>
+                                <p class="text-gray-200 mt-4 text-lg line-clamp-2 max-w-3xl font-medium">
+                                    {{ Str::limit(strip_tags($featured->content), 150) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar: More Top Stories -->
+                    <div class="flex flex-col gap-6">
+                        <h3 class="font-black text-xl uppercase border-l-4 border-[#C2B280] pl-3 mb-2 tracking-tighter">Editors Choice</h3>
+                        @foreach($articles->slice(1, 3) as $top)
+                        <div class="flex gap-4 group cursor-pointer border-b border-gray-200 dark:border-gray-700 pb-4">
+                            <div class="flex-shrink-0 w-24 h-24 rounded overflow-hidden shadow-sm">
+                                @if($top->featured_image)
+                                    <img src="{{ Str::startsWith($top->featured_image, 'http') ? $top->featured_image : asset('storage/' . $top->featured_image) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                                @else
+                                    <div class="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-[10px]">No Preview</div>
+                                @endif
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <h4 class="font-bold text-sm group-hover:text-[#C2B280] transition line-clamp-2 leading-snug">{{ $top->title }}</h4>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="text-[9px] text-[#C2B280] uppercase font-black tracking-widest">{{ $top->category->name ?? 'Journal' }}</span>
+                                    <span class="text-[9px] text-gray-400 font-bold uppercase">/ {{ $top->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            @endguest
                         </div>
-                    </main>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-            <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 mt-16 lg:mt-0 opacity-20 lg:opacity-100 hidden sm:block">
-                <!-- A simple placeholder for hero graphic (gradient pattern) -->
-                <div class="w-full h-56 sm:h-72 md:h-96 lg:h-full lg:w-full object-cover bg-gradient-to-br from-indigo-500 to-purple-600"></div>
-            </div>
-        </div>
 
-        <!-- Articles Grid Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl">Latest News & Articles</h2>
-                <p class="mt-4 text-lg text-gray-500 dark:text-gray-400">Catch up on the newest trends and tutorials.</p>
-            </div>
+                <!-- Section: Latest Grid -->
+                <div class="mb-8 flex items-center justify-between border-b-2 border-gray-200 dark:border-gray-700 pb-2">
+                    <h2 class="font-black text-2xl uppercase tracking-tighter">Latest Coverage</h2>
+                    <a href="/?all=true" class="text-xs font-black text-[#C2B280] hover:underline uppercase tracking-widest">View Archives</a>
+                </div>
 
-            <div class="grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
-                @forelse($articles as $article)
-                    <div class="flex flex-col rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/20 overflow-hidden bg-white dark:bg-gray-800 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-black/40 transition duration-300 border border-gray-100 dark:border-gray-700">
-                        <!-- Thumbnail -->
-                        <div class="flex-shrink-0 h-48 w-full relative">
-                            @if($article->featured_image)
-                                <img src="{{ Str::startsWith($article->featured_image, 'http') ? $article->featured_image : asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover">
-                            @else
-                                <div class="h-full w-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 text-gray-500">No Image</div>
-                            @endif
-                            <div class="absolute top-4 left-4">
-                                <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300 backdrop-blur-sm shadow-sm">
-                                    {{ $article->category->name ?? 'Uncategorized' }}
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    @forelse($articles->slice(4) as $article)
+                        <div class="flex flex-col group cursor-pointer">
+                            <div class="h-40 overflow-hidden rounded mb-3 relative shadow-md">
+                                @if($article->featured_image)
+                                    <img src="{{ Str::startsWith($article->featured_image, 'http') ? $article->featured_image : asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover group-hover:scale-110 transition duration-300">
+                                @else
+                                    <div class="h-full w-full flex items-center justify-center bg-gray-200 dark:bg-gray-800 text-gray-400 italic">No image available</div>
+                                @endif
+                                <span class="absolute top-2 left-2 bg-white/90 dark:bg-black/60 backdrop-blur-md text-gray-900 dark:text-white text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter shadow-sm border border-gray-100 dark:border-gray-800">
+                                    {{ $article->category->name ?? 'Culture' }}
                                 </span>
                             </div>
+                            <h3 class="font-bold text-lg leading-tight group-hover:text-[#C2B280] dark:group-hover:text-[#E1C16E] transition line-clamp-2 mb-2">
+                                {{ $article->title }}
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2 font-medium">
+                                {{ Str::limit(strip_tags($article->content), 80) }}
+                            </p>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $article->created_at->format('M d, Y') }} | By {{ strtok($article->user->name ?? 'Staff', ' ') }}</span>
                         </div>
-                        <!-- Content -->
-                        <div class="flex-1 p-6 flex flex-col justify-between">
-                            <div class="flex-1">
-                                <a href="#" class="block mt-2">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-white line-clamp-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
-                                        {{ $article->title }}
-                                    </h3>
-                                    <p class="mt-3 text-base text-gray-600 dark:text-gray-400 line-clamp-3">
-                                        {{ Str::limit(strip_tags($article->content), 120) }}
-                                    </p>
-                                </a>
-                            </div>
-                            <!-- Meta Footer -->
-                            <div class="mt-6 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                                        {{ substr($article->user->name ?? 'A', 0, 1) }}
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                            {{ $article->user->name ?? 'Anonymous' }}
-                                        </p>
-                                        <div class="flex space-x-1 text-xs text-gray-500 dark:text-gray-400">
-                                            <time datetime="{{ $article->created_at->format('Y-m-d') }}">
-                                                {{ $article->created_at->format('M d, Y') }}
-                                            </time>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No articles</h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Please wait for our contributors to write new contents.</p>
-                    </div>
-                @endforelse
-            </div>
+                    @empty
+                        <div class="col-span-full py-12 text-center text-gray-500 italic">Wait for more coverage to be published...</div>
+                    @endforelse
+                </div>
+            @else
+                <div class="py-20 text-center animate-pulse">
+                    <h2 class="text-3xl font-black text-gray-300 dark:text-gray-700">Connecting to Artify Stream...</h2>
+                    <p class="text-gray-400 mt-2">No articles available at this moment. Stay tuned.</p>
+                </div>
+            @endif
 
             <!-- Pagination -->
-            <div class="mt-12">
+            <div class="mt-16 border-t border-gray-200 dark:border-gray-700 pt-8">
                 {{ $articles->links() }}
             </div>
         </div>
 
         <!-- Footer -->
-        <footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 py-8 mt-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center">
-                <p class="text-gray-500 dark:text-gray-400 text-sm">
-                    &copy; {{ date('Y') }} Articles.
-                </p>
+        <footer class="bg-gray-900 text-white pt-16 pb-8 border-t-8 border-[#F5F5DC]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                    <div class="md:col-span-2">
+                        <span class="font-black text-4xl tracking-tighter text-[#C2B280]">Artify</span>
+                        <p class="mt-4 text-gray-400 max-w-sm font-medium leading-relaxed">
+                            A refined platform for high-quality journalism and tech-focused storytelling. Curated for the modern reader who values design and depth.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-black uppercase mb-4 text-[#C2B280] tracking-widest text-xs">Navigation</h4>
+                        <ul class="space-y-3 text-sm text-gray-400 font-bold uppercase tracking-tighter">
+                            <li><a href="#" class="hover:text-[#C2B280] transition">Privacy</a></li>
+                            <li><a href="#" class="hover:text-[#C2B280] transition">Terms</a></li>
+                            <li><a href="{{ route('admin.partners.index') }}" class="text-[#F5F5DC] hover:text-white transition decoration-[#C2B280] underline underline-offset-8">Partner Program</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-black uppercase mb-4 text-[#C2B280] tracking-widest text-xs">Connect</h4>
+                        <div class="flex gap-4">
+                            <div class="w-9 h-9 border border-gray-700 hover:bg-[#C2B280] hover:text-white flex items-center justify-center transition cursor-pointer text-xs font-bold shadow-sm">𝕏</div>
+                            <div class="w-9 h-9 border border-gray-700 hover:bg-[#C2B280] hover:text-white flex items-center justify-center transition cursor-pointer text-xs font-bold shadow-sm">FB</div>
+                            <div class="w-9 h-9 border border-gray-700 hover:bg-[#C2B280] hover:text-white flex items-center justify-center transition cursor-pointer text-xs font-bold shadow-sm">IG</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-500 text-[10px] uppercase font-black tracking-widest">
+                        &copy; {{ date('Y') }} Artify Journal. Crafted with clarity.
+                    </p>
+                    <div class="flex gap-6 text-[10px] text-gray-500 font-black">
+                        <a href="/" class="hover:text-[#C2B280] tracking-widest transition">HOME</a>
+                        <a href="/" class="hover:text-[#C2B280] tracking-widest transition">CONTACT</a>
+                        <a href="{{ route('admin.partners.index') }}" class="hover:text-[#C2B280] tracking-widest transition uppercase">Partnership</a>
+                    </div>
+                </div>
             </div>
         </footer>
 
